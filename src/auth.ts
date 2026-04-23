@@ -1,9 +1,6 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import { users } from "./lib/db/schema";
-import { eq } from "drizzle-orm";
-import { db } from "./lib/db";
-import bcrypt from "bcryptjs";
+import { mockUsers } from "./lib/db/mock-data";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
@@ -16,19 +13,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
-        const [user] = await db.select().from(users).where(eq(users.email, credentials.email as string)).limit(1);
+        // AUTHENTICATION WITH MOCK DATA
+        const user = mockUsers.find(u => u.email === credentials.email && u.password === credentials.password);
 
-        if (!user || !user.password) return null;
-
-        const isPasswordCorrect = await bcrypt.compare(credentials.password as string, user.password);
-
-        if (!isPasswordCorrect) return null;
+        if (!user) return null;
 
         return {
           id: user.id.toString(),
           name: user.name,
           email: user.email,
-          role: user.role || 'user',
+          role: user.role,
         };
       },
     }),

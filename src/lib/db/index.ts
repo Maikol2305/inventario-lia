@@ -2,15 +2,24 @@ import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 import * as schema from './schema';
 
-if (!process.env.DATABASE_URL && process.env.NODE_ENV === 'production') {
-  // During build time on some CI/CD, DATABASE_URL might be missing.
-  // We can provide a dummy or just export a null-safe proxy if needed, 
-  // but usually Next.js build needs this to be present if used in server components.
-  console.warn("DATABASE_URL is missing. Database operations will fail.");
+const isProduction = process.env.NODE_ENV === 'production';
+const hasDbUrl = !!process.env.DATABASE_URL;
+
+let dbInstance: any = null;
+
+if (hasDbUrl) {
+  const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+  });
+  dbInstance = drizzle(pool, { schema });
+} else {
+  // Dummy db object to avoid build errors
+  dbInstance = {
+    select: () => ({ from: () => ({ where: () => ({ limit: () => [] }) }) }),
+    insert: () => ({ values: () => ({ returning: () => [] }) }),
+    update: () => ({ set: () => ({ where: () => [] }) }),
+    delete: () => ({ where: () => [] }),
+  };
 }
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-});
-
-export const db = drizzle(pool, { schema });
+export const db = dbInstance;
