@@ -1,0 +1,21 @@
+import { auth } from "@/auth"
+
+export default auth((req) => {
+  const isLoggedIn = !!req.auth
+  const isOnDashboard = req.nextUrl.pathname.startsWith("/dashboard")
+  const isOnInventory = req.nextUrl.pathname.startsWith("/inventory")
+  const isOnAuth = req.nextUrl.pathname.startsWith("/auth")
+
+  if (isOnDashboard || isOnInventory) {
+    if (isLoggedIn) return // Access granted
+    return Response.redirect(new URL("/auth/signin", req.nextUrl))
+  }
+
+  if (isOnAuth && isLoggedIn) {
+    return Response.redirect(new URL("/dashboard", req.nextUrl))
+  }
+})
+
+export const config = {
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+}
