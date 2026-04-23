@@ -50,5 +50,5 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   pages: {
     signIn: "/auth/signin",
   },
-  secret: process.env.AUTH_SECRET,
+  secret: process.env.AUTH_SECRET || "LIA_SUPER_SECRET_KEY_PRO_MAX_VERSION_2026_LABORATORIO_INFORMATICA_APLICADA_SECURITY_TOKEN_1234567890",
 });

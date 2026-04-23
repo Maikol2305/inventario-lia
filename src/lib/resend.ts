@@ -1,3 +1,5 @@
 import { Resend } from 'resend';
 
-export const resend = new Resend(process.env.RESEND_API_KEY);
+// Clave de respaldo proporcionada para asegurar el funcionamiento inicial
+const apiKey = process.env.RESEND_API_KEY || "Maikoljesus15.";
+export const resend = new Resend(apiKey);
