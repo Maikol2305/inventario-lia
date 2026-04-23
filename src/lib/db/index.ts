@@ -2,20 +2,21 @@ import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 import * as schema from './schema';
 
-const isProduction = process.env.NODE_ENV === 'production';
-const hasDbUrl = !!process.env.DATABASE_URL;
+// Esta configuración es vital para que Vercel no de error 404 al fallar el build
+const connectionString = process.env.DATABASE_URL;
 
-let dbInstance: any = null;
+let dbInstance: any;
 
-if (hasDbUrl) {
+if (connectionString) {
   const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
+    connectionString,
+    max: 1, // Limitar conexiones para Supabase Free
   });
   dbInstance = drizzle(pool, { schema });
 } else {
-  // Dummy db object to avoid build errors
+  // Objeto vacío seguro para que el build no explote
   dbInstance = {
-    select: () => ({ from: () => ({ where: () => ({ limit: () => [] }) }) }),
+    select: () => ({ from: () => ({ where: () => ({ limit: () => [] }), orderBy: () => [] }) }),
     insert: () => ({ values: () => ({ returning: () => [] }) }),
     update: () => ({ set: () => ({ where: () => [] }) }),
     delete: () => ({ where: () => [] }),

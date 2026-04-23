@@ -22,6 +22,7 @@ export default function SignInPage() {
     setError("")
 
     try {
+      // Intentar login sin redirección automática
       const result = await signIn("credentials", {
         email,
         password,
@@ -29,12 +30,13 @@ export default function SignInPage() {
       })
 
       if (result?.error) {
-        setError("Credenciales inválidas")
+        setError("Credenciales inválidas. Usa admin@lia.com / lia2026")
       } else {
-        router.push("/dashboard")
+        // Redirigir manualmente después de éxito
+        window.location.href = "/dashboard"
       }
     } catch (err) {
-      setError("Ocurrió un error al iniciar sesión")
+      setError("Error de conexión con LÍA")
     } finally {
       setLoading(false)
     }
@@ -42,60 +44,31 @@ export default function SignInPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
-      <Card className="w-full max-w-md shadow-xl border-t-4 border-t-blue-600">
-        <CardHeader className="space-y-1 text-center">
-          <div className="flex justify-center mb-4">
+      <Card className="w-full max-w-md shadow-2xl border-t-4 border-blue-600">
+        <CardHeader className="text-center">
+          <div className="flex justify-center mb-2">
             <div className="bg-blue-100 p-3 rounded-full">
               <LockKeyhole className="w-8 h-8 text-blue-600" />
             </div>
           </div>
-          <CardTitle className="text-2xl font-bold tracking-tight">Acceso LÍA</CardTitle>
-          <CardDescription>
-            Ingresa tus credenciales para gestionar el inventario
-          </CardDescription>
+          <CardTitle className="text-2xl font-black">Laboratorio LÍA</CardTitle>
+          <CardDescription>Inventario de Informática Aplicada</CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
-            {error && (
-              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-2 rounded-md text-sm text-center font-medium">
-                {error}
-              </div>
-            )}
+            {error && <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md text-center">{error}</div>}
             <div className="space-y-2">
-              <Label htmlFor="email">Correo Electrónico</Label>
-              <Input 
-                id="email" 
-                type="email" 
-                placeholder="nombre@ejemplo.com" 
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="h-12"
-              />
+              <Label>Correo de Acceso</Label>
+              <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Contraseña</Label>
-              <Input 
-                id="password" 
-                type="password" 
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="h-12"
-              />
+              <Label>Contraseña</Label>
+              <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
             </div>
           </CardContent>
           <CardFooter>
-            <Button 
-              type="submit" 
-              className="w-full h-12 text-lg bg-blue-600 hover:bg-blue-700 transition-colors"
-              disabled={loading}
-            >
-              {loading ? (
-                <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Iniciando...</>
-              ) : (
-                "Entrar al Sistema"
-              )}
+            <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 h-12 text-lg" disabled={loading}>
+              {loading ? <Loader2 className="animate-spin" /> : "Iniciar Sesión"}
             </Button>
           </CardFooter>
         </form>
