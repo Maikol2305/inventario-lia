@@ -2,7 +2,7 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { users } from "./lib/db/schema";
 import { eq } from "drizzle-orm";
-import { db } from "./lib/db"; // I'll create this next
+import { db } from "./lib/db";
 import bcrypt from "bcryptjs";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
@@ -18,7 +18,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         const [user] = await db.select().from(users).where(eq(users.email, credentials.email as string)).limit(1);
 
-        if (!user) return null;
+        if (!user || !user.password) return null;
 
         const isPasswordCorrect = await bcrypt.compare(credentials.password as string, user.password);
 
@@ -28,7 +28,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           id: user.id.toString(),
           name: user.name,
           email: user.email,
-          role: user.role,
+          role: user.role || 'user',
         };
       },
     }),
@@ -42,7 +42,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
     async session({ session, token }) {
       if (session.user) {
-        (session.user as any).role = token.role;
+        (session.user as any).role = token.role as string;
       }
       return session;
     },
@@ -50,4 +50,5 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   pages: {
     signIn: "/auth/signin",
   },
+  secret: process.env.AUTH_SECRET,
 });
