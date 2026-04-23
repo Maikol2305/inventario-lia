@@ -66,8 +66,9 @@ export default function StockAlerts() {
               if (open) setReplenishAmount(product.minStock - product.quantity + 10);
             }}
           >
-            <DialogTrigger asChild>
-              <Card className="border-l-4 border-red-500 shadow-md cursor-pointer hover:shadow-lg transition-all group overflow-hidden relative">
+            <DialogTrigger>
+              <div className="cursor-pointer">
+              <Card className="border-l-4 border-red-500 shadow-md hover:shadow-lg transition-all group overflow-hidden relative">
                 <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
                    <AlertTriangle className="w-16 h-16 text-red-600" />
                 </div>
@@ -103,6 +104,7 @@ export default function StockAlerts() {
                   </div>
                 </CardContent>
               </Card>
+              </div>
             </DialogTrigger>
             
             <DialogContent className="sm:max-w-[450px]">
